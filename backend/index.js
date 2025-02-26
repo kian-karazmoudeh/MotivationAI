@@ -6,6 +6,7 @@ const cors = require("cors");
 const openAI = require("openai");
 const cookieParser = require('cookie-parser');
 const verifyToken = require('./authMiddleware');
+const { z } = require('zod');
 
 require('dotenv').config();
 
@@ -18,8 +19,124 @@ app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
 const client = new openAI.OpenAI({ apiKey: process.env.GPT_API_KEY});
 
+// Zod validation schemas
+const loginSchema = {
+  body: z.object({
+    email: z.string({
+        message:"Email is invalid"
+    })
+      .email({ message: "Invalid email format" })
+      .max(255, { message: "Email must be less than 255 characters" }),
+    password: z.string({
+        message:"Password is invalid"
+    })
+      .min(6, { message: "Password must be at least 6 characters" })
+      .max(100, { message: "Password must be less than 100 characters" })
+      .regex(/\d/, { message: "Password must contain at least one number" })
+      .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter" })
+      .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
+      .regex(/[!@#$%^&*]/, { message: "Password must contain at least one special character" })
+  })
+};
 
-app.get('/motivate/:mood', verifyToken, async (req, res) => {
+const signupSchema = {
+  body: z.object({
+    firstname: z.string({
+        message:"First name is invalid"
+    })
+      .min(1, { message: "First name is required" })
+      .max(50, { message: "First name must be less than 50 characters" })
+      .regex(/^[a-zA-Z\s-']+$/, { message: "First name can only contain letters, spaces, hyphens and apostrophes" }),
+    lastname: z.string({
+        message:"Last name is invalid"
+    })
+      .min(1, { message: "Last name is required" })
+      .max(50, { message: "Last name must be less than 50 characters" })
+      .regex(/^[a-zA-Z\s-']+$/, { message: "Last name can only contain letters, spaces, hyphens and apostrophes" }),
+    email: z.string({
+        message:"Email is invalid"
+    })
+      .min(1, { message: "Email is required" })
+      .email({ message: "Invalid email format" })
+      .max(255, { message: "Email must be less than 255 characters" }),
+    password: z.string({
+        message:"Password is invalid"
+    })
+      .min(6, { message: "Password must be at least 6 characters" })
+      .max(100, { message: "Password must be less than 100 characters" })
+      .regex(/\d/, { message: "Password must contain at least one number" })
+      .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter" })
+      .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
+      .regex(/[!@#$%^&*]/, { message: "Password must contain at least one special character" }),
+    about: z.string({
+        message:"About is invalid"
+    })
+      .max(1000, { message: "About section must be less than 1000 characters" })
+      .optional(),
+    bigDream: z.string({
+        message:"Big dream is invalid"
+    })
+      .max(1000, { message: "Big dream must be less than 1000 characters" })
+      .optional(),
+    inspiration: z.string({
+        message:"Inspiration is invalid"
+    })
+      .max(1000, { message: "Inspiration must be less than 1000 characters" })
+      .optional(),
+    obstacles: z.string({
+        message:"Obstacles is invalid"
+    })
+      .max(1000, { message: "Obstacles must be less than 1000 characters" })
+      .optional(),
+    fears: z.string({
+        message:"Fears is invalid"
+    })
+      .max(1000, { message: "Fears must be less than 1000 characters" })
+      .optional(),
+    regrets: z.string({
+        message:"Regrets is invalid"
+    })
+      .max(1000, { message: "Regrets must be less than 1000 characters" })
+      .optional()
+  })
+};
+
+const moodSchema = {
+  params: z.object({
+    mood: z.string({
+        message:"Mood is invalid"
+    })
+      .min(1, { message: "Mood parameter is required" })
+      .max(100, { message: "Mood must be less than 100 characters" })
+      .regex(/^[a-zA-Z\s]+$/, { message: "Mood can only contain letters and spaces" })
+  })
+};
+
+// Validation middleware
+const validateRequest = (schema) => (req, res, next) => {
+  try {
+    if (schema.params) {
+      schema.params.parse(req.params);
+    }
+    
+    if (schema.body) {
+      schema.body.parse(req.body);
+    }
+    
+    if (schema.query) {
+      schema.query.parse(req.query);
+    }
+    
+    next();
+  } catch (error) {
+    return res.status(400).json({
+      message: "Validation failed",
+      errors: error.errors || error.message
+    });
+  }
+};
+
+app.get('/motivate/:mood', verifyToken, validateRequest(moodSchema), async (req, res) => {
     const { mood } = req.params;
     try {
         const completions = await client.chat.completions.create({
@@ -37,7 +154,7 @@ app.get('/motivate/:mood', verifyToken, async (req, res) => {
     }
 })
 
-app.post('/authenticate', async (req, res) => {
+app.post('/authenticate', validateRequest(loginSchema), async (req, res) => {
     try {
         const { email, password } = req.body;
 
@@ -67,7 +184,7 @@ app.post('/authenticate', async (req, res) => {
     }
 });
 
-app.post('/signup', async (req, res) => {
+app.post('/signup', validateRequest(signupSchema), async (req, res) => {
     const { firstname, lastname, email, password, about, bigDream, inspiration, obstacles, fears, regrets } = req.body;
 
     try {
