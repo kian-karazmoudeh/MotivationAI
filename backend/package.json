@@ -2,9 +2,11 @@
   "name": "motivation-ai",
   "version": "1.0.0",
   "description": "Server for Motivation AI",
-  "main": "index.js",
+  "main": "src/server.js",
   "scripts": {
-    "test": "test"
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
@@ -18,5 +20,9 @@
     "mysql2": "^3.12.0",
     "openai": "^4.85.4",
     "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.0"
   }
 }

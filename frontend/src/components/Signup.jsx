@@ -4,14 +4,13 @@ import PersonalDetails from "./FormPages/PersonalDetails";
 import Motivators from "./FormPages/Motivators";
 import Demotivators from "./FormPages/Demotivators";
 import FinishingTouches from "./FormPages/FinishingTouches";
-import axios from "axios";
-import useSignIn from "react-auth-kit/hooks/useSignIn";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signupSchema } from "../schema/signupSchema";
+import { useAuth } from "../contexts/AuthContext";
 
 function Signup() {
-    const signIn = useSignIn();
+    const {signup} = useAuth();
     const [ page, setPage ] = useState(0);
     
     const methods = useForm({
@@ -53,21 +52,8 @@ function Signup() {
 
     async function handleSignup(data) {
         try {
-            const response = await axios.post("http://localhost:5000/signup", data, {
-                headers: { "Content-Type": "application/json" },
-                withCredentials: true,
-            });
-            
-            if (response.data.token) {
-                signIn({
-                    auth: {
-                        token: response.data.token,
-                        type: "Bearer"
-                    },
-                    userState: { email: data.email }
-                });
+                await signup(data);
                 alert("Signup successful");
-            }
         } catch (err) {
             console.log(err);
             alert("error");
