@@ -1,18 +1,24 @@
-import { Input, Textarea, VStack } from "@chakra-ui/react";
+import { VStack } from "@chakra-ui/react";
+import FormField from "../FormField";
 
-
-function FinishingTouches({ formData, setFormData }) {
+function FinishingTouches() {
     return (
         <VStack spacing={3}>
-            <Input placeholder="Email"
-                value={formData.email}
-                onChange={e => setFormData({ ...formData, email: e.target.value})}/>
-            <Input placeholder="Password"
-                value={formData.password}
-                onChange={e => setFormData({ ...formData, password: e.target.value})}/>
-            <Input placeholder="Confirm Password"
-                value={formData.confirmPassword}
-                onChange={e => setFormData({ ...formData, confirmPassword: e.target.value})} />
+            <FormField 
+                name="email"
+                placeholder="Email"
+                type="email"
+            />
+            <FormField 
+                name="password"
+                placeholder="Password"
+                type="password"
+            />
+            <FormField 
+                name="confirmPassword"
+                placeholder="Confirm Password"
+                type="password"
+            />
         </VStack>)
 }
 

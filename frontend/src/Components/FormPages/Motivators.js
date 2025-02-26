@@ -1,15 +1,19 @@
-import { HStack, Input, Textarea, VStack } from "@chakra-ui/react";
+import { VStack } from "@chakra-ui/react";
+import FormField from "../FormField";
 
-function Motivators({ formData, setFormData }) {
+function Motivators() {
     return (
         <VStack spacing={3}>
-            <Textarea placeholder="What's one big dream you are working towards?" 
-                value={formData.bigDream}
-                onChange={e => setFormData({ ...formData, bigDream: e.target.value})}/>
-            <Textarea placeholder="Who or what inspires you?"
-                value={formData.inspiration}
-                onChange={e => setFormData({ ...formData, inspiration: e.target.value})} />
-            
+            <FormField 
+                name="bigDream"
+                placeholder="What's one big dream you are working towards?"
+                isTextarea={true}
+            />
+            <FormField 
+                name="inspiration"
+                placeholder="Who or what inspires you?"
+                isTextarea={true}
+            />
         </VStack>
     )
 }

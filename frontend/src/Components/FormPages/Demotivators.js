@@ -1,17 +1,24 @@
-import { Textarea, VStack } from "@chakra-ui/react";
+import { VStack } from "@chakra-ui/react";
+import FormField from "../FormField";
 
-function Demotivators({ formData, setFormData }) {
+function Demotivators() {
     return (
     <VStack spacing={3}>
-        <Textarea placeholder="What are the 3 biggest Obstacles in your life right now?"
-            value={formData.obstacles}
-            onChange={e => setFormData({ ...formData, obstacles: e.target.value})}/>
-        <Textarea placeholder="What are your biggest fears?"
-            value={formData.fears}
-            onChange={e => setFormData({ ...formData, fears: e.target.value})}/>
-        <Textarea placeholder="What are your biggest regrets?"
-            value={formData.regrets}
-            onChange={e => setFormData({ ...formData, regrets: e.target.value})} />
+        <FormField 
+            name="obstacles"
+            placeholder="What are the 3 biggest Obstacles in your life right now?"
+            isTextarea={true}
+        />
+        <FormField 
+            name="fears"
+            placeholder="What are your biggest fears?"
+            isTextarea={true}
+        />
+        <FormField 
+            name="regrets"
+            placeholder="What are your biggest regrets?"
+            isTextarea={true}
+        />
     </VStack>)
 }
 

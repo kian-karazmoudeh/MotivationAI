@@ -1,16 +1,25 @@
-import { HStack, Input, Textarea, VStack } from "@chakra-ui/react";
+import { HStack, VStack } from "@chakra-ui/react";
+import FormField from "../FormField";
 
-function PersonalDetails({ formData, setFormData }) {
+function PersonalDetails() {
     return (
         <VStack spacing={3}>
-            <HStack spacing={3}>
-                <Input placeholder="Firstname" value={formData.firstname} onChange={e => setFormData({ ...formData, firstname: e.target.value})} />
-                <Input placeholder="Lastname" value={formData.lastname} onChange={e => setFormData({ ...formData, lastname: e.target.value})} />
+            <HStack spacing={3} width="100%">
+                <FormField 
+                    name="firstname"
+                    placeholder="Firstname" 
+                />
+                <FormField 
+                    name="lastname"
+                    placeholder="Lastname" 
+                />
             </HStack>
-            <Textarea h="200px" placeholder="What does your daily routine look like?"
-                value={formData.about} 
-                onChange={e => setFormData({ ...formData, about: e.target.value })}/>
-            
+            <FormField 
+                name="about"
+                placeholder="What does your daily routine look like?"
+                isTextarea={true}
+                h="200px"
+            />
         </VStack>
     )
 }
